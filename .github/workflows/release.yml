@@ -145,9 +145,9 @@ jobs:
         with:
           draft: false
           tag_name: ${{ github.event.inputs.version }}
-          body: 'Release built'
+          body: 'Release built from source'
           files: ./HevSocks5Tunnel.xcframework.zip
           repository: 'tozik/Tun2SocksKit'
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SECOND_REPO_TOKEN }} # Используем новый секрет
 
 
