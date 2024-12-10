@@ -138,8 +138,23 @@ jobs:
       - name: Zip xcframework
         run: |
           zip -r HevSocks5Tunnel.xcframework.zip ./HevSocks5Tunnel.xcframework
+          
+      # Клонируем публичный репозиторий и пушим артефакты
+      - name: Clone public repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'tozik/Tun2SocksKit'
+          token: ${{ secrets.SECOND_REPO_TOKEN }}
 
-      # Загрузим артефакт в публичный репозиторий как релиз
+      # Копируем артефакт и коммитим
+      - name: Copy and commit xcframework
+        run: |
+          cp ./HevSocks5Tunnel.xcframework.zip ./ 
+          git add HevSocks5Tunnel.xcframework.zip Package.swift
+          git commit -m "Add build artifact: ${{ github.event.inputs.version }}"
+          git push
+
+      # Загрузим релизный артефакт в публичный репозиторий
       - name: Upload release asset to second repo
         uses: softprops/action-gh-release@v1
         with:
@@ -148,6 +163,6 @@ jobs:
           body: 'Release built from source'
           files: ./HevSocks5Tunnel.xcframework.zip
           repository: 'tozik/Tun2SocksKit'
-          token: ${{ secrets.SECOND_REPO_TOKEN }} # Используем новый секрет
+          token: ${{ secrets.SECOND_REPO_TOKEN }}
 
 
