@@ -142,7 +142,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - run: |
-          cp ./HevSocks5Tunnel.xcframework.zip ./your-username/public-repo-for-builds/
+          cp ./HevSocks5Tunnel.xcframework.zip ./tozik/Tun2SocksKit/
           git add .
           git commit -m "Add build: ${{ github.event.inputs.version }}"
           git push
