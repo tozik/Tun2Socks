@@ -142,9 +142,9 @@ jobs:
       # Сохраняем Package.swift
       - name: Save Package.swift
         run: |
-          mkdir -p save_dir
-          cp Package.swift save_dir/
-          
+          mkdir -p /tmp/package_backup
+          cp Package.swift /tmp/package_backup/
+
       # Клонируем публичный репозиторий
       - name: Clone public repo
         uses: actions/checkout@v3
@@ -155,7 +155,8 @@ jobs:
       # Восстанавливаем Package.swift
       - name: Restore Package.swift
         run: |
-          cp save_dir/Package.swift ./
+          cp /tmp/package_backup/Package.swift ./
+          echo "Содержимое текущего каталога после восстановления:"
           ls
           
       # Копируем Package.swift и пушим изменения
@@ -175,5 +176,3 @@ jobs:
           files: ./HevSocks5Tunnel.xcframework.zip
           repository: 'tozik/Tun2SocksKit'
           token: ${{ secrets.SECOND_REPO_TOKEN }}
-
-
