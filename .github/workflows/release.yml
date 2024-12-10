@@ -139,21 +139,28 @@ jobs:
         run: |
           zip -r HevSocks5Tunnel.xcframework.zip ./HevSocks5Tunnel.xcframework
                 
+      # Сохраняем Package.swift
+      - name: Save Package.swift
+        run: |
+          mkdir -p save_dir
+          cp Package.swift save_dir/
+          
       # Клонируем публичный репозиторий
       - name: Clone public repo
         uses: actions/checkout@v3
         with:
           repository: 'tozik/Tun2SocksKit'
           token: ${{ secrets.SECOND_REPO_TOKEN }}
-      
-      # Копируем Package.swift из основного репозитория
+
+      # Восстанавливаем Package.swift
+      - name: Restore Package.swift
+        run: |
+          cp save_dir/Package.swift ./
+          ls
+          
+      # Копируем Package.swift и пушим изменения
       - name: Copy and commit xcframework
         run: |
-          echo "Содержимое текущего каталога основного репозитория перед клонированием второго:"
-          ls $GITHUB_WORKSPACE
-          cp $GITHUB_WORKSPACE/Package.swift ./  # Используем абсолютный путь к основному репозиторию
-          echo "Содержимое каталога после копирования:"
-          ls
           git add Package.swift
           git commit -m "Add build artifact: ${{ github.event.inputs.version }}"
           git push
