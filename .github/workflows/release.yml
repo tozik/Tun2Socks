@@ -139,22 +139,30 @@ jobs:
         run: |
           zip -r HevSocks5Tunnel.xcframework.zip ./HevSocks5Tunnel.xcframework
           
-      # Клонируем публичный репозиторий и пушим артефакты
+      # Клонируем публичный репозиторий
       - name: Clone public repo
         uses: actions/checkout@v3
         with:
           repository: 'tozik/Tun2SocksKit'
           token: ${{ secrets.SECOND_REPO_TOKEN }}
-
+      
+      # Убедимся, что файл Package.swift существует
+      - name: Ensure Package.swift exists
+        run: |
+          if [ ! -f Package.swift ]; then
+            echo "Package.swift not found in the working directory!"
+            ls ../
+            exit 1
+          fi
+      
       # Копируем артефакт и коммитим
       - name: Copy and commit xcframework
         run: |
-          ls
           cp ../Package.swift ./
           git add Package.swift
           git commit -m "Add build artifact: ${{ github.event.inputs.version }}"
           git push
-
+      
       # Загрузим релизный артефакт в публичный репозиторий
       - name: Upload release asset to second repo
         uses: softprops/action-gh-release@v1
