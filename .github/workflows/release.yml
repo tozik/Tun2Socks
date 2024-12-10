@@ -149,7 +149,7 @@ jobs:
       # Копируем Package.swift из основного репозитория
       - name: Copy and commit xcframework
         run: |
-          cp $GITHUB_WORKSPACE/Package.swift ./  # GITHUB_WORKSPACE всегда указывает на текущий репозиторий
+          cp $GITHUB_WORKSPACE/Package.swift ./  # Указываем путь к основному репозиторию
           ls
           git add Package.swift
           git commit -m "Add build artifact: ${{ github.event.inputs.version }}"
