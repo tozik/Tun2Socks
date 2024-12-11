@@ -119,8 +119,6 @@ jobs:
           cd Templates
           sed -i "_bak" "s/VERSION/${{ github.event.inputs.version }}/g" Package.template
           sed -i "_bak" "s/CHECKSUM/${CHECKSUM}/g" Package.template
-          ls -l ./HevSocks5Tunnel.xcframework.zip
-          shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
           
       - name: Update Package.swift
         run: |
@@ -150,11 +148,11 @@ jobs:
     #Сохраняем артефакт и Package.swift
       - name: Save artifacts
         run: |
+          ls -l ./HevSocks5Tunnel.xcframework.zip
+          shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
           mkdir -p /tmp/artifact_backup
           cp HevSocks5Tunnel.xcframework.zip /tmp/artifact_backup/
           cp Package.swift /tmp/artifact_backup/
-          ls -l ./HevSocks5Tunnel.xcframework.zip
-          shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
           
       # Клонируем публичный репозиторий
       - name: Clone public repo
