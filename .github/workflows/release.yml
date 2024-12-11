@@ -119,6 +119,8 @@ jobs:
           cd Templates
           sed -i "_bak" "s/VERSION/${{ github.event.inputs.version }}/g" Package.template
           sed -i "_bak" "s/CHECKSUM/${CHECKSUM}/g" Package.template
+          ls -l ./HevSocks5Tunnel.xcframework.zip
+          shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
           
       - name: Update Package.swift
         run: |
@@ -137,7 +139,13 @@ jobs:
       # Проверяем артефакт
       - name: Zip xcframework
         run: |
-          zip -r HevSocks5Tunnel.xcframework.zip ./HevSocks5Tunnel.xcframework
+          if [ ! -f HevSocks5Tunnel.xcframework.zip ]; then
+            echo "Артефакт уже существует, повторная упаковка не требуется."
+          else
+            zip -r HevSocks5Tunnel.xcframework.zip ./HevSocks5Tunnel.xcframework
+          fi
+          ls -l ./HevSocks5Tunnel.xcframework.zip
+          shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
                 
     #Сохраняем артефакт и Package.swift
       - name: Save artifacts
@@ -145,7 +153,9 @@ jobs:
           mkdir -p /tmp/artifact_backup
           cp HevSocks5Tunnel.xcframework.zip /tmp/artifact_backup/
           cp Package.swift /tmp/artifact_backup/
-      
+          ls -l ./HevSocks5Tunnel.xcframework.zip
+          shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
+          
       # Клонируем публичный репозиторий
       - name: Clone public repo
         uses: actions/checkout@v3
@@ -169,6 +179,8 @@ jobs:
           git add Package.swift
           git commit -m "Add build artifact: ${{ github.event.inputs.version }}"
           git push
+          ls -l ./HevSocks5Tunnel.xcframework.zip
+          shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
       
       # Загрузим релизный артефакт в публичный репозиторий
       - name: Upload release asset to second repo
@@ -181,7 +193,7 @@ jobs:
           repository: 'tozik/Tun2SocksKit'
           token: ${{ secrets.SECOND_REPO_TOKEN }}
 
-          # Проверяем checksum после релиза
+       # Проверяем checksum после релиза
       - name: Verify checksum in release
         run: |
           curl -LO https://github.com/tozik/Tun2SocksKit/releases/download/${{ github.event.inputs.version }}/HevSocks5Tunnel.xcframework.zip
