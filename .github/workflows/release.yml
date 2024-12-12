@@ -134,7 +134,7 @@ jobs:
           echo "    )," >> Package.swift
           echo "    .target(" >> Package.swift
           echo "      name: \"Tun2SocksKitC\"," >> Package.swift
-          echo "      dependencies: \".\"" >> Package.swift
+          echo "      publicHeadersPath: \".\"" >> Package.swift
           echo "    )," >> Package.swift
           echo "    .binaryTarget(" >> Package.swift
           echo "      name: \"HevSocks5Tunnel\"," >> Package.swift
