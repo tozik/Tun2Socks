@@ -205,7 +205,7 @@ jobs:
         with:
           draft: false
           tag_name: ${{ github.event.inputs.version }}
-          body: 'Release built from source'
+          body: 'Release built from source ${{ github.event.inputs.tag }}'
           files: ./HevSocks5Tunnel.xcframework.zip
           repository: 'tozik/Tun2SocksKit'
           token: ${{ secrets.SECOND_REPO_TOKEN }}
