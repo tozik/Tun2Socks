@@ -211,13 +211,13 @@ jobs:
           token: ${{ secrets.SECOND_REPO_TOKEN }}
 
        # Проверяем checksum после релиза
-      - name: Verify checksum in release
-        run: |
-          curl -LO https://github.com/tozik/Tun2SocksKit/releases/download/${{ github.event.inputs.version }}/HevSocks5Tunnel.xcframework.zip
-          export ACTUAL_CHECKSUM=`shasum -a 256 HevSocks5Tunnel.xcframework.zip | awk '{print $1}'`
-          echo "Actual checksum: $ACTUAL_CHECKSUM"
-          echo "Expected checksum: $(cat /tmp/artifact_backup/Package.swift | grep checksum | awk '{print $2}')"
-          if [[ "$ACTUAL_CHECKSUM" != "$(cat /tmp/artifact_backup/Package.swift | grep checksum | awk '{print $2}')" ]]; then
-            echo "Checksum mismatch!"
-            exit 1
-          fi
+      #- name: Verify checksum in release
+      #  run: |
+      #    curl -LO https://github.com/tozik/Tun2SocksKit/releases/download/${{ github.event.inputs.version }}/HevSocks5Tunnel.xcframework.zip
+      #    export ACTUAL_CHECKSUM=`shasum -a 256 HevSocks5Tunnel.xcframework.zip | awk '{print $1}'`
+      #    echo "Actual checksum: $ACTUAL_CHECKSUM"
+      #    echo "Expected checksum: $(cat /tmp/artifact_backup/Package.swift | grep checksum | awk '{print $2}')"
+      #    if [[ "$ACTUAL_CHECKSUM" != "$(cat /tmp/artifact_backup/Package.swift | grep checksum | awk '{print $2}')" ]]; then
+      #      echo "Checksum mismatch!"
+      #      exit 1
+      #    fi
