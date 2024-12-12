@@ -144,14 +144,14 @@ jobs:
           echo "  ]" >> Package.swift
           echo ")" >> Package.swift
           
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Tun2SocksKit Release ${{ github.event.inputs.version }}!!!
-          commit_user_name: tozik
-          commit_user_email: tozika@inbox.ru
-          commit_author: Tozik <tozika@inbox.ru>
-          tagging_message: ${{ github.event.inputs.version }}
-          file_pattern: 'Package.swift'
+      #- uses: stefanzweifel/git-auto-commit-action@v4
+      #  with:
+      #    commit_message: Tun2SocksKit Release ${{ github.event.inputs.version }}!!!
+      #    commit_user_name: tozik
+      #    commit_user_email: tozika@inbox.ru
+      #    commit_author: Tozik <tozika@inbox.ru>
+      #    tagging_message: ${{ github.event.inputs.version }}
+      #    file_pattern: 'Package.swift'
           
       # Проверяем артефакт
       #- name: Zip xcframework
