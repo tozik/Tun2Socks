@@ -114,6 +114,8 @@ jobs:
       
       - name: Update package file
         run: |
+          export CHECKSUM=$(shasum -a 256 ./HevSocks5Tunnel.xcframework.zip | awk '{print $1}')
+          echo "Computed SHA256 checksum: $CHECKSUM"
           echo "// swift-tools-version: 5.7" > Package.swift
           echo "" >> Package.swift
           echo "import PackageDescription" >> Package.swift
@@ -137,11 +139,10 @@ jobs:
           echo "    .binaryTarget(" >> Package.swift
           echo "      name: \"LibXray\"," >> Package.swift
           echo "      url: \"https://github.com/tozik/Tun2SocksKit/releases/download/${{ github.event.inputs.version }}/LibXray.xcframework.zip\"," >> Package.swift
-          echo "      checksum: \"${{ env.FILE_CHECKSUM }}\"" >> Package.swift
+          echo "      checksum: \"$CHECKSUM\"" >> Package.swift
           echo "    )" >> Package.swift
           echo "  ]" >> Package.swift
           echo ")" >> Package.swift
-          
           
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
