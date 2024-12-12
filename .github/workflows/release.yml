@@ -111,19 +111,37 @@ jobs:
                      -headers ./include \
                      -output ./HevSocks5Tunnel.xcframework
           zip -r HevSocks5Tunnel.xcframework.zip HevSocks5Tunnel.xcframework
-          
-      - name: Rende Template
+      
+      - name: Update package file
         run: |
-          export TEMP=`shasum -a 256 ./HevSocks5Tunnel.xcframework.zip`
-          export CHECKSUM=${TEMP:0:64}
-          cd Templates
-          sed -i "_bak" "s/VERSION/${{ github.event.inputs.version }}/g" Package.template
-          sed -i "_bak" "s/CHECKSUM/${CHECKSUM}/g" Package.template
+          echo "// swift-tools-version: 5.7" > Package.swift
+          echo "" >> Package.swift
+          echo "import PackageDescription" >> Package.swift
+          echo "" >> Package.swift
+          echo "let package = Package(" >> Package.swift
+          echo "  name: \"Tun2SocksKit\"," >> Package.swift
+          echo "  platforms: [.iOS(.v15), .macOS(.v15)]," >> Package.swift
+          echo "  products: [" >> Package.swift
+          echo "    .library(name: \"Tun2SocksKit\", targets: [\"Tun2SocksKit\"])," >> Package.swift
+          echo "    .library(name: \"Tun2SocksKitC\", targets: [\"Tun2SocksKitC\"])" >> Package.swift
+          echo "  ]," >> Package.swift
+          echo "  targets: [" >> Package.swift
+          echo "    .target(" >> Package.swift
+          echo "      name: \"Tun2SocksKit\"," >> Package.swift
+          echo "      dependencies: [\"HevSocks5Tunnel\", \"Tun2SocksKitC\"])" >> Package.swift
+          echo "    )," >> Package.swift
+          echo "    .target(" >> Package.swift
+          echo "      name: \"Tun2SocksKitC\"," >> Package.swift
+          echo "      dependencies: \".\"" >> Package.swift
+          echo "    )," >> Package.swift
+          echo "    .binaryTarget(" >> Package.swift
+          echo "      name: \"LibXray\"," >> Package.swift
+          echo "      url: \"https://github.com/tozik/Tun2SocksKit/releases/download/${{ github.event.inputs.version }}/LibXray.xcframework.zip\"," >> Package.swift
+          echo "      checksum: \"${{ env.FILE_CHECKSUM }}\"" >> Package.swift
+          echo "    )" >> Package.swift
+          echo "  ]" >> Package.swift
+          echo ")" >> Package.swift
           
-      - name: Update Package.swift
-        run: |
-          rm -f Package.swift
-          cp ./Templates/Package.template Package.swift
           
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
@@ -135,15 +153,15 @@ jobs:
           file_pattern: 'Package.swift'
           
       # Проверяем артефакт
-      - name: Zip xcframework
-        run: |
-          if [ ! -f HevSocks5Tunnel.xcframework.zip ]; then
-            echo "Артефакт уже существует, повторная упаковка не требуется."
-          else
-            zip -r HevSocks5Tunnel.xcframework.zip ./HevSocks5Tunnel.xcframework
-          fi
-          ls -l ./HevSocks5Tunnel.xcframework.zip
-          shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
+      #- name: Zip xcframework
+      #  run: |
+      #    if [ ! -f HevSocks5Tunnel.xcframework.zip ]; then
+      #      echo "Артефакт уже существует, повторная упаковка не требуется."
+      #    else
+      #      zip -r HevSocks5Tunnel.xcframework.zip ./HevSocks5Tunnel.xcframework
+      #    fi
+      #    ls -l ./HevSocks5Tunnel.xcframework.zip
+      #    shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
                 
     #Сохраняем артефакт и Package.swift
       - name: Save artifacts
