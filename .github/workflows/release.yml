@@ -130,7 +130,7 @@ jobs:
           echo "  targets: [" >> Package.swift
           echo "    .target(" >> Package.swift
           echo "      name: \"Tun2SocksKit\"," >> Package.swift
-          echo "      dependencies: [\"HevSocks5Tunnel\", \"Tun2SocksKitC\"])" >> Package.swift
+          echo "      dependencies: [\"HevSocks5Tunnel\", \"Tun2SocksKitC\"]" >> Package.swift
           echo "    )," >> Package.swift
           echo "    .target(" >> Package.swift
           echo "      name: \"Tun2SocksKitC\"," >> Package.swift
