@@ -144,23 +144,29 @@ jobs:
           echo "  ]" >> Package.swift
           echo ")" >> Package.swift
                 
-    # Пушим артефакт и Package.swift
-      - name: Commit build artifact and Package.swift
+      # Пушим артефакт и Package.swift
+      - name: Commit Package.swift
         run: |
           # Выводим список файлов в текущем каталоге и проверяем артефакт
           ls -l ./HevSocks5Tunnel.xcframework.zip
           shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
           
-          # Добавляем все нужные файлы в git
-          git add Package.swift HevSocks5Tunnel.xcframework.zip
+          # Добавляем только Package.swift в git
+          git add Package.swift
           
           # Выполняем commit с тегом версии
-          git commit -m "Add build artifact: ${{ github.event.inputs.version }}"
+          git commit -m "Update Package.swift for version ${{ github.event.inputs.version }}"
           
           # Пушим изменения в текущий репозиторий
           git push
-          
-          # Проверяем результат пуша
-          ls -l ./HevSocks5Tunnel.xcframework.zip
-          shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
+      
+      # Создаем релиз и загружаем артефакт в секцию "Releases" GitHub
+      - name: Upload release asset to GitHub Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          tag_name: ${{ github.event.inputs.version }}
+          body: 'Release built from source ${{ github.event.inputs.tag }}'
+          files: ./HevSocks5Tunnel.xcframework.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
 
