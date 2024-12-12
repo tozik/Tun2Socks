@@ -138,7 +138,7 @@ jobs:
           echo "    )," >> Package.swift
           echo "    .binaryTarget(" >> Package.swift
           echo "      name: \"HevSocks5Tunnel\"," >> Package.swift
-          echo "      url: \"https://github.com/tozik/Tun2SocksKit/releases/download/${{ github.event.inputs.version }}/HevSocks5Tunnel.xcframework.zip\"," >> Package.swift
+          echo "      url: \"https://github.com/tozik/Tun2Socks-tozik/releases/download/${{ github.event.inputs.version }}/HevSocks5Tunnel.xcframework.zip\"," >> Package.swift
           echo "      checksum: \"$CHECKSUM\"" >> Package.swift
           echo "    )" >> Package.swift
           echo "  ]" >> Package.swift
