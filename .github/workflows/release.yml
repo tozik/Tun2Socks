@@ -143,81 +143,24 @@ jobs:
           echo "    )" >> Package.swift
           echo "  ]" >> Package.swift
           echo ")" >> Package.swift
-          
-      #- uses: stefanzweifel/git-auto-commit-action@v4
-      #  with:
-      #    commit_message: Tun2SocksKit Release ${{ github.event.inputs.version }}!!!
-      #    commit_user_name: tozik
-      #    commit_user_email: tozika@inbox.ru
-      #    commit_author: Tozik <tozika@inbox.ru>
-      #    tagging_message: ${{ github.event.inputs.version }}
-      #    file_pattern: 'Package.swift'
-          
-      # Проверяем артефакт
-      #- name: Zip xcframework
-      #  run: |
-      #    if [ ! -f HevSocks5Tunnel.xcframework.zip ]; then
-      #      echo "Артефакт уже существует, повторная упаковка не требуется."
-      #    else
-      #      zip -r HevSocks5Tunnel.xcframework.zip ./HevSocks5Tunnel.xcframework
-      #    fi
-      #    ls -l ./HevSocks5Tunnel.xcframework.zip
-      #    shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
                 
-    #Сохраняем артефакт и Package.swift
-      - name: Save artifacts
+    # Пушим артефакт и Package.swift
+      - name: Commit build artifact and Package.swift
         run: |
+          # Выводим список файлов в текущем каталоге и проверяем артефакт
           ls -l ./HevSocks5Tunnel.xcframework.zip
           shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
-          mkdir -p /tmp/artifact_backup
-          cp HevSocks5Tunnel.xcframework.zip /tmp/artifact_backup/
-          cp Package.swift /tmp/artifact_backup/
           
-      # Клонируем публичный репозиторий
-      - name: Clone public repo
-        uses: actions/checkout@v3
-        with:
-          repository: 'tozik/Tun2SocksKit'
-          token: ${{ secrets.SECOND_REPO_TOKEN }}
-      
-      # Восстанавливаем Package.swift
-      - name: Restore Package.swift
-        run: |
-          cp /tmp/artifact_backup/Package.swift ./
-          echo "Содержимое текущего каталога после восстановления Package.swift:"
-          ls
-      
-      # Восстанавливаем и пушим артефакт
-      - name: Restore and commit artifact
-        run: |
-          cp /tmp/artifact_backup/HevSocks5Tunnel.xcframework.zip ./
-          echo "Содержимое текущего каталога после восстановления артефакта:"
-          ls
-          git add Package.swift
+          # Добавляем все нужные файлы в git
+          git add Package.swift HevSocks5Tunnel.xcframework.zip
+          
+          # Выполняем commit с тегом версии
           git commit -m "Add build artifact: ${{ github.event.inputs.version }}"
+          
+          # Пушим изменения в текущий репозиторий
           git push
+          
+          # Проверяем результат пуша
           ls -l ./HevSocks5Tunnel.xcframework.zip
           shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
-      
-      # Загрузим релизный артефакт в публичный репозиторий
-      - name: Upload release asset to second repo
-        uses: softprops/action-gh-release@v1
-        with:
-          draft: false
-          tag_name: ${{ github.event.inputs.version }}
-          body: 'Release built from source ${{ github.event.inputs.tag }}'
-          files: ./HevSocks5Tunnel.xcframework.zip
-          repository: 'tozik/Tun2SocksKit'
-          token: ${{ secrets.SECOND_REPO_TOKEN }}
 
-       # Проверяем checksum после релиза
-      #- name: Verify checksum in release
-      #  run: |
-      #    curl -LO https://github.com/tozik/Tun2SocksKit/releases/download/${{ github.event.inputs.version }}/HevSocks5Tunnel.xcframework.zip
-      #    export ACTUAL_CHECKSUM=`shasum -a 256 HevSocks5Tunnel.xcframework.zip | awk '{print $1}'`
-      #    echo "Actual checksum: $ACTUAL_CHECKSUM"
-      #    echo "Expected checksum: $(cat /tmp/artifact_backup/Package.swift | grep checksum | awk '{print $2}')"
-      #    if [[ "$ACTUAL_CHECKSUM" != "$(cat /tmp/artifact_backup/Package.swift | grep checksum | awk '{print $2}')" ]]; then
-      #      echo "Checksum mismatch!"
-      #      exit 1
-      #    fi
