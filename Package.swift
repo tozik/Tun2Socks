@@ -12,15 +12,15 @@ let package = Package(
   targets: [
     .target(
       name: "Tun2SocksKit",
-      dependencies: ["HevSocks5Tunnel", "Tun2SocksKitC"]
+      dependencies: ["NetworkTunnelProcessor", "Tun2SocksKitC"]
     ),
     .target(
       name: "Tun2SocksKitC",
       publicHeadersPath: "."
     ),
     .binaryTarget(
-      name: "HevSocks5Tunnel",
-      url: "https://github.com/tozik/Tun2Socks-tozik/releases/download/4.7.20/HevSocks5Tunnel.xcframework.zip",
+      name: "NetworkTunnelProcessor",
+      url: "https://github.com/tozik/Tun2Socks/releases/download/4.7.20/NetworkTunnelProcessor.xcframework.zip",
       checksum: "1bf98c2908802912e1b057c10ff4e97664a621d34b219d62150767a446858482"
     )
   ]

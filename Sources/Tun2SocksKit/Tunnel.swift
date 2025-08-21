@@ -1,6 +1,6 @@
 import Foundation
 import Tun2SocksKitC
-import HevSocks5Tunnel
+import NetworkTunnelProcessor
 import CryptoKit
 
 // Расширение для хеширования

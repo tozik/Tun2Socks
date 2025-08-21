@@ -1,0 +1,4 @@
+module NetworkTunnelProcessor {
+    umbrella header "network-tunnel-processor.h"
+    export *
+}
