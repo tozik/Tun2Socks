@@ -1,201 +1,201 @@
-name: Release
+# name: Release
 
-on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Release version'     
-        required: true
-        type: string
-      tag:
-        description: 'Git Tag to checkout'
-        required: true
-        type: string
-      branch:
-        description: 'Source branch to build from'
-        required: false
-        default: 'main'
-        type: choice
-        options:
-          - main
-          - master
-          - ofuscating
-          - develop
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       version:
+#         description: 'Release version'     
+#         required: true
+#         type: string
+#       tag:
+#         description: 'Git Tag to checkout'
+#         required: true
+#         type: string
+#       branch:
+#         description: 'Source branch to build from'
+#         required: false
+#         default: 'main'
+#         type: choice
+#         options:
+#           - main
+#           - master
+#           - ofuscating
+#           - develop
 
-jobs:
-  release:
-    runs-on: macOS-15
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch }}
-      - uses: actions/checkout@v4
-        with:
-          repository: 'heiher/hev-socks5-tunnel'
-          submodules: 'true'
-          path: 'temp'
-          ref: ${{ github.event.inputs.tag }}
-      - uses: actions/checkout@v4
-        with:
-          repository: 'tozik/hev-socks5-tunnel-iphonesimulator-new'
-          path: 'fake'
+# jobs:
+#   release:
+#     runs-on: macOS-15
+#     steps:
+#       - uses: actions/checkout@v4
+#         with:
+#           ref: ${{ github.event.inputs.branch }}
+#       - uses: actions/checkout@v4
+#         with:
+#           repository: 'heiher/hev-socks5-tunnel'
+#           submodules: 'true'
+#           path: 'temp'
+#           ref: ${{ github.event.inputs.tag }}
+#       - uses: actions/checkout@v4
+#         with:
+#           repository: 'tozik/hev-socks5-tunnel-iphonesimulator-new'
+#           path: 'fake'
           
-      - name: build macos arm64_x86_64
-        run: |
-          mkdir macos_arm64_x86_64
-          mkdir macos_arm64_x86_64/macos_arm64
-          mkdir macos_arm64_x86_64/macos_x86_64
-          cd temp
-          make clean
-          make PP=g++ \
-               CC=gcc \
-               CFLAGS="-arch x86_64 -mmacosx-version-min=12.0" \
-               LFLAGS="-arch x86_64 -mmacosx-version-min=12.0 -Wl,-Bsymbolic-functions" static
-          libtool -static -o ../macos_arm64_x86_64/macos_x86_64/libhev-socks5-tunnel.a \
-                  bin/libhev-socks5-tunnel.a \
-                  third-part/lwip/bin/liblwip.a \
-                  third-part/yaml/bin/libyaml.a \
-                  third-part/hev-task-system/bin/libhev-task-system.a
-          make clean
-          make clean
-          make PP=g++ \
-               CC=gcc \
-               CFLAGS="-arch arm64 -mmacosx-version-min=12.0" \
-               LFLAGS="-arch arm64 -mmacosx-version-min=12.0 -Wl,-Bsymbolic-functions" static
-          libtool -static -o ../macos_arm64_x86_64/macos_arm64/libhev-socks5-tunnel.a \
-                  bin/libhev-socks5-tunnel.a \
-                  third-part/lwip/bin/liblwip.a \
-                  third-part/yaml/bin/libyaml.a \
-                  third-part/hev-task-system/bin/libhev-task-system.a
-          cd ../macos_arm64_x86_64
-          lipo -create -o ./libhev-socks5-tunnel.a ./macos_arm64/libhev-socks5-tunnel.a ./macos_x86_64/libhev-socks5-tunnel.a
+#       - name: build macos arm64_x86_64
+#         run: |
+#           mkdir macos_arm64_x86_64
+#           mkdir macos_arm64_x86_64/macos_arm64
+#           mkdir macos_arm64_x86_64/macos_x86_64
+#           cd temp
+#           make clean
+#           make PP=g++ \
+#                CC=gcc \
+#                CFLAGS="-arch x86_64 -mmacosx-version-min=12.0" \
+#                LFLAGS="-arch x86_64 -mmacosx-version-min=12.0 -Wl,-Bsymbolic-functions" static
+#           libtool -static -o ../macos_arm64_x86_64/macos_x86_64/libhev-socks5-tunnel.a \
+#                   bin/libhev-socks5-tunnel.a \
+#                   third-part/lwip/bin/liblwip.a \
+#                   third-part/yaml/bin/libyaml.a \
+#                   third-part/hev-task-system/bin/libhev-task-system.a
+#           make clean
+#           make clean
+#           make PP=g++ \
+#                CC=gcc \
+#                CFLAGS="-arch arm64 -mmacosx-version-min=12.0" \
+#                LFLAGS="-arch arm64 -mmacosx-version-min=12.0 -Wl,-Bsymbolic-functions" static
+#           libtool -static -o ../macos_arm64_x86_64/macos_arm64/libhev-socks5-tunnel.a \
+#                   bin/libhev-socks5-tunnel.a \
+#                   third-part/lwip/bin/liblwip.a \
+#                   third-part/yaml/bin/libyaml.a \
+#                   third-part/hev-task-system/bin/libhev-task-system.a
+#           cd ../macos_arm64_x86_64
+#           lipo -create -o ./libhev-socks5-tunnel.a ./macos_arm64/libhev-socks5-tunnel.a ./macos_x86_64/libhev-socks5-tunnel.a
 
           
-      - name: build iphoneos arm64
-        run: |
-          mkdir iphoneos_arm64
-          cd temp
-          make clean
-          make PP="xcrun --sdk iphoneos --toolchain iphoneos clang" \
-               CC="xcrun --sdk iphoneos --toolchain iphoneos clang" \
-               CFLAGS="-arch arm64 -mios-version-min=12.0" \
-               LFLAGS="-arch arm64 -mios-version-min=12.0 -Wl,-Bsymbolic-functions" static
-          libtool -static -o ../iphoneos_arm64/libhev-socks5-tunnel.a \
-                  bin/libhev-socks5-tunnel.a \
-                  third-part/lwip/bin/liblwip.a \
-                  third-part/yaml/bin/libyaml.a \
-                  third-part/hev-task-system/bin/libhev-task-system.a
-          make clean
+#       - name: build iphoneos arm64
+#         run: |
+#           mkdir iphoneos_arm64
+#           cd temp
+#           make clean
+#           make PP="xcrun --sdk iphoneos --toolchain iphoneos clang" \
+#                CC="xcrun --sdk iphoneos --toolchain iphoneos clang" \
+#                CFLAGS="-arch arm64 -mios-version-min=12.0" \
+#                LFLAGS="-arch arm64 -mios-version-min=12.0 -Wl,-Bsymbolic-functions" static
+#           libtool -static -o ../iphoneos_arm64/libhev-socks5-tunnel.a \
+#                   bin/libhev-socks5-tunnel.a \
+#                   third-part/lwip/bin/liblwip.a \
+#                   third-part/yaml/bin/libyaml.a \
+#                   third-part/hev-task-system/bin/libhev-task-system.a
+#           make clean
           
-      - name: build iphonesimulator arm64_x86_64
-        run: |
-          mkdir iphonesimulator_arm64_x86_64
-          mkdir iphonesimulator_arm64_x86_64/iphonesimulator_arm64
-          mkdir iphonesimulator_arm64_x86_64/iphonesimulator_x86_64
-          cd fake
-          make clean
-          make PP="xcrun -sdk iphonesimulator clang" \
-               CC="xcrun -sdk iphonesimulator clang" \
-               CFLAGS="-arch arm64 -mios-simulator-version-min=12.0" \
-               LFLAGS="-arch arm64 -mios-simulator-version-min=12.0 -Wl,-Bsymbolic-functions" static
-          cp bin/libhev-socks5-tunnel.a ../iphonesimulator_arm64_x86_64/iphonesimulator_arm64/libhev-socks5-tunnel.a
-          make clean
-          make PP="xcrun -sdk iphonesimulator clang" \
-               CC="xcrun -sdk iphonesimulator clang" \
-               CFLAGS="-arch x86_64 -mios-simulator-version-min=12.0" \
-               LFLAGS="-arch x86_64 -mios-simulator-version-min=12.0 -Wl,-Bsymbolic-functions" static
-          cp bin/libhev-socks5-tunnel.a ../iphonesimulator_arm64_x86_64/iphonesimulator_x86_64/libhev-socks5-tunnel.a
-          make clean
-          cd ../iphonesimulator_arm64_x86_64
-          lipo -create -o ./libhev-socks5-tunnel.a ./iphonesimulator_arm64/libhev-socks5-tunnel.a ./iphonesimulator_x86_64/libhev-socks5-tunnel.a
+#       - name: build iphonesimulator arm64_x86_64
+#         run: |
+#           mkdir iphonesimulator_arm64_x86_64
+#           mkdir iphonesimulator_arm64_x86_64/iphonesimulator_arm64
+#           mkdir iphonesimulator_arm64_x86_64/iphonesimulator_x86_64
+#           cd fake
+#           make clean
+#           make PP="xcrun -sdk iphonesimulator clang" \
+#                CC="xcrun -sdk iphonesimulator clang" \
+#                CFLAGS="-arch arm64 -mios-simulator-version-min=12.0" \
+#                LFLAGS="-arch arm64 -mios-simulator-version-min=12.0 -Wl,-Bsymbolic-functions" static
+#           cp bin/libhev-socks5-tunnel.a ../iphonesimulator_arm64_x86_64/iphonesimulator_arm64/libhev-socks5-tunnel.a
+#           make clean
+#           make PP="xcrun -sdk iphonesimulator clang" \
+#                CC="xcrun -sdk iphonesimulator clang" \
+#                CFLAGS="-arch x86_64 -mios-simulator-version-min=12.0" \
+#                LFLAGS="-arch x86_64 -mios-simulator-version-min=12.0 -Wl,-Bsymbolic-functions" static
+#           cp bin/libhev-socks5-tunnel.a ../iphonesimulator_arm64_x86_64/iphonesimulator_x86_64/libhev-socks5-tunnel.a
+#           make clean
+#           cd ../iphonesimulator_arm64_x86_64
+#           lipo -create -o ./libhev-socks5-tunnel.a ./iphonesimulator_arm64/libhev-socks5-tunnel.a ./iphonesimulator_x86_64/libhev-socks5-tunnel.a
           
-      - name: Build xcframework
-        run: |
-          mkdir include
-          cp temp/src/hev-main.h include/network-tunnel-processor.h
-          cp ./Templates/NetworkTunnelProcessor.template include/module.modulemap
-          xcodebuild -create-xcframework \
-                     -library ./iphoneos_arm64/libhev-socks5-tunnel.a \
-                     -headers ./include \
-                     -library ./iphonesimulator_arm64_x86_64/libhev-socks5-tunnel.a \
-                     -headers ./include \
-                     -library ./macos_arm64_x86_64/libhev-socks5-tunnel.a \
-                     -headers ./include \
-                     -output ./NetworkTunnelProcessor.xcframework
-          zip -r NetworkTunnelProcessor.xcframework.zip NetworkTunnelProcessor.xcframework
+#       - name: Build xcframework
+#         run: |
+#           mkdir include
+#           cp temp/src/hev-main.h include/network-tunnel-processor.h
+#           cp ./Templates/NetworkTunnelProcessor.template include/module.modulemap
+#           xcodebuild -create-xcframework \
+#                      -library ./iphoneos_arm64/libhev-socks5-tunnel.a \
+#                      -headers ./include \
+#                      -library ./iphonesimulator_arm64_x86_64/libhev-socks5-tunnel.a \
+#                      -headers ./include \
+#                      -library ./macos_arm64_x86_64/libhev-socks5-tunnel.a \
+#                      -headers ./include \
+#                      -output ./NetworkTunnelProcessor.xcframework
+#           zip -r NetworkTunnelProcessor.xcframework.zip NetworkTunnelProcessor.xcframework
       
-      - name: Update package file
-        run: |
-          export CHECKSUM=$(shasum -a 256 ./NetworkTunnelProcessor.xcframework.zip | awk '{print $1}')
-          echo "Computed SHA256 checksum: $CHECKSUM"
-          echo "Building from branch: ${{ github.event.inputs.branch }}"
-          echo "// swift-tools-version: 5.7" > Package.swift
-          echo "" >> Package.swift
-          echo "import PackageDescription" >> Package.swift
-          echo "" >> Package.swift
-          echo "let package = Package(" >> Package.swift
-          echo "  name: \"Tun2SocksKit\"," >> Package.swift
-          echo "  platforms: [.iOS(.v15), .macOS(.v13)]," >> Package.swift
-          echo "  products: [" >> Package.swift
-          echo "    .library(name: \"Tun2SocksKit\", targets: [\"Tun2SocksKit\"])," >> Package.swift
-          echo "    .library(name: \"Tun2SocksKitC\", targets: [\"Tun2SocksKitC\"])" >> Package.swift
-          echo "  ]," >> Package.swift
-          echo "  targets: [" >> Package.swift
-          echo "    .target(" >> Package.swift
-          echo "      name: \"Tun2SocksKit\"," >> Package.swift
-          echo "      dependencies: [\"NetworkTunnelProcessor\", \"Tun2SocksKitC\"]" >> Package.swift
-          echo "    )," >> Package.swift
-          echo "    .target(" >> Package.swift
-          echo "      name: \"Tun2SocksKitC\"," >> Package.swift
-          echo "      publicHeadersPath: \".\"" >> Package.swift
-          echo "    )," >> Package.swift
-          echo "    .binaryTarget(" >> Package.swift
-          echo "      name: \"NetworkTunnelProcessor\"," >> Package.swift
-          echo "      url: \"https://github.com/tozik/Tun2Socks/releases/download/${{ github.event.inputs.version }}/NetworkTunnelProcessor.xcframework.zip\"," >> Package.swift
-          echo "      checksum: \"$CHECKSUM\"" >> Package.swift
-          echo "    )" >> Package.swift
-          echo "  ]" >> Package.swift
-          echo ")" >> Package.swift
+#       - name: Update package file
+#         run: |
+#           export CHECKSUM=$(shasum -a 256 ./NetworkTunnelProcessor.xcframework.zip | awk '{print $1}')
+#           echo "Computed SHA256 checksum: $CHECKSUM"
+#           echo "Building from branch: ${{ github.event.inputs.branch }}"
+#           echo "// swift-tools-version: 5.7" > Package.swift
+#           echo "" >> Package.swift
+#           echo "import PackageDescription" >> Package.swift
+#           echo "" >> Package.swift
+#           echo "let package = Package(" >> Package.swift
+#           echo "  name: \"Tun2SocksKit\"," >> Package.swift
+#           echo "  platforms: [.iOS(.v15), .macOS(.v13)]," >> Package.swift
+#           echo "  products: [" >> Package.swift
+#           echo "    .library(name: \"Tun2SocksKit\", targets: [\"Tun2SocksKit\"])," >> Package.swift
+#           echo "    .library(name: \"Tun2SocksKitC\", targets: [\"Tun2SocksKitC\"])" >> Package.swift
+#           echo "  ]," >> Package.swift
+#           echo "  targets: [" >> Package.swift
+#           echo "    .target(" >> Package.swift
+#           echo "      name: \"Tun2SocksKit\"," >> Package.swift
+#           echo "      dependencies: [\"NetworkTunnelProcessor\", \"Tun2SocksKitC\"]" >> Package.swift
+#           echo "    )," >> Package.swift
+#           echo "    .target(" >> Package.swift
+#           echo "      name: \"Tun2SocksKitC\"," >> Package.swift
+#           echo "      publicHeadersPath: \".\"" >> Package.swift
+#           echo "    )," >> Package.swift
+#           echo "    .binaryTarget(" >> Package.swift
+#           echo "      name: \"NetworkTunnelProcessor\"," >> Package.swift
+#           echo "      url: \"https://github.com/tozik/Tun2Socks/releases/download/${{ github.event.inputs.version }}/NetworkTunnelProcessor.xcframework.zip\"," >> Package.swift
+#           echo "      checksum: \"$CHECKSUM\"" >> Package.swift
+#           echo "    )" >> Package.swift
+#           echo "  ]" >> Package.swift
+#           echo ")" >> Package.swift
                 
-      # Пушим артефакт и Package.swift
-      - name: Commit Package.swift
-        run: |
-          # Выводим список файлов в текущем каталоге и проверяем артефакт
-          ls -l ./NetworkTunnelProcessor.xcframework.zip
-          shasum -a 256 ./NetworkTunnelProcessor.xcframework.zip
+#       # Пушим артефакт и Package.swift
+#       - name: Commit Package.swift
+#         run: |
+#           # Выводим список файлов в текущем каталоге и проверяем артефакт
+#           ls -l ./NetworkTunnelProcessor.xcframework.zip
+#           shasum -a 256 ./NetworkTunnelProcessor.xcframework.zip
           
-          # Настраиваем git
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+#           # Настраиваем git
+#           git config --local user.email "action@github.com"
+#           git config --local user.name "GitHub Action"
           
-          # Добавляем только Package.swift в git
-          git add Package.swift
+#           # Добавляем только Package.swift в git
+#           git add Package.swift
           
-          # Выполняем commit с информацией о версии и ветке
-          git commit -m "Update Package.swift for version ${{ github.event.inputs.version }} from branch ${{ github.event.inputs.branch }}"
+#           # Выполняем commit с информацией о версии и ветке
+#           git commit -m "Update Package.swift for version ${{ github.event.inputs.version }} from branch ${{ github.event.inputs.branch }}"
           
-          # Пушим изменения в выбранную ветку
-          git push origin ${{ github.event.inputs.branch }}
+#           # Пушим изменения в выбранную ветку
+#           git push origin ${{ github.event.inputs.branch }}
       
-      # Создаем релиз и загружаем артефакт в секцию "Releases" GitHub
-      - name: Upload release asset to GitHub Releases
-        uses: softprops/action-gh-release@v1
-        with:
-          draft: false
-          tag_name: ${{ github.event.inputs.version }}
-          body: |
-            Release built from source tag: ${{ github.event.inputs.tag }}
-            Source branch: ${{ github.event.inputs.branch }}
+#       # Создаем релиз и загружаем артефакт в секцию "Releases" GitHub
+#       - name: Upload release asset to GitHub Releases
+#         uses: softprops/action-gh-release@v1
+#         with:
+#           draft: false
+#           tag_name: ${{ github.event.inputs.version }}
+#           body: |
+#             Release built from source tag: ${{ github.event.inputs.tag }}
+#             Source branch: ${{ github.event.inputs.branch }}
             
-            ## Changes in this release:
-            - Built with NetworkTunnelProcessor framework
-            - Source code obfuscated for enhanced security
+#             ## Changes in this release:
+#             - Built with NetworkTunnelProcessor framework
+#             - Source code obfuscated for enhanced security
             
-            ## Installation:
-            Add this package to your project using Swift Package Manager:
-            ```
-            https://github.com/tozik/Tun2Socks
-            ```
-          files: ./NetworkTunnelProcessor.xcframework.zip
-          token: ${{ secrets.GITHUB_TOKEN }}
+#             ## Installation:
+#             Add this package to your project using Swift Package Manager:
+#             ```
+#             https://github.com/tozik/Tun2Socks
+#             ```
+#           files: ./NetworkTunnelProcessor.xcframework.zip
+#           token: ${{ secrets.GITHUB_TOKEN }}
 
