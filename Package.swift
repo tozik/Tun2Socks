@@ -20,8 +20,8 @@ let package = Package(
     ),
     .binaryTarget(
       name: "NetworkTunnelProcessor",
-      url: "https://github.com/tozik/Tun2Socks/releases/download/4.7.25/NetworkTunnelProcessor.xcframework.zip",
-      checksum: "7656f9b2d79b36b6551a95526398e8bfc44e2800c8fcc5699e2dd66857e13258"
+      url: "https://github.com/tozik/Tun2Socks/releases/download/4.7.26/NetworkTunnelProcessor.xcframework.zip",
+      checksum: "6ca87fdf423ad9ab3a8736f17032996f48c7fd89cf10476eaa6e9b74812c4c93"
     )
   ]
 )
