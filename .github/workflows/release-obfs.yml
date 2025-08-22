@@ -176,6 +176,10 @@ jobs:
           
           # Пушим изменения в выбранную ветку
           git push origin ${{ github.event.inputs.branch }}
+          
+          # Создаем новый тег для релиза
+          git tag -f ${{ github.event.inputs.version }}
+          git push origin ${{ github.event.inputs.version }} --force
       
       # Создаем релиз и загружаем артефакт в секцию "Releases" GitHub
       - name: Upload release asset to GitHub Releases
