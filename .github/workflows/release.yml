@@ -11,19 +11,31 @@ on:
         description: 'Git Tag to checkout'
         required: true
         type: string
+      branch:
+        description: 'Source branch to build from'
+        required: false
+        default: 'main'
+        type: choice
+        options:
+          - main
+          - master
+          - ofuscating
+          - develop
 
 jobs:
   release:
     runs-on: macOS-15
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+      - uses: actions/checkout@v4
         with:
           repository: 'heiher/hev-socks5-tunnel'
           submodules: 'true'
           path: 'temp'
           ref: ${{ github.event.inputs.tag }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: 'tozik/hev-socks5-tunnel-iphonesimulator-new'
           path: 'fake'
@@ -100,8 +112,8 @@ jobs:
       - name: Build xcframework
         run: |
           mkdir include
-          cp temp/src/hev-main.h include/hev-socks5-tunnel.h
-          cp ./Templates/HevSocks5Tunnel.template include/module.modulemap
+          cp temp/src/hev-main.h include/network-tunnel-processor.h
+          cp ./Templates/NetworkTunnelProcessor.template include/module.modulemap
           xcodebuild -create-xcframework \
                      -library ./iphoneos_arm64/libhev-socks5-tunnel.a \
                      -headers ./include \
@@ -109,13 +121,14 @@ jobs:
                      -headers ./include \
                      -library ./macos_arm64_x86_64/libhev-socks5-tunnel.a \
                      -headers ./include \
-                     -output ./HevSocks5Tunnel.xcframework
-          zip -r HevSocks5Tunnel.xcframework.zip HevSocks5Tunnel.xcframework
+                     -output ./NetworkTunnelProcessor.xcframework
+          zip -r NetworkTunnelProcessor.xcframework.zip NetworkTunnelProcessor.xcframework
       
       - name: Update package file
         run: |
-          export CHECKSUM=$(shasum -a 256 ./HevSocks5Tunnel.xcframework.zip | awk '{print $1}')
+          export CHECKSUM=$(shasum -a 256 ./NetworkTunnelProcessor.xcframework.zip | awk '{print $1}')
           echo "Computed SHA256 checksum: $CHECKSUM"
+          echo "Building from branch: ${{ github.event.inputs.branch }}"
           echo "// swift-tools-version: 5.7" > Package.swift
           echo "" >> Package.swift
           echo "import PackageDescription" >> Package.swift
@@ -130,15 +143,15 @@ jobs:
           echo "  targets: [" >> Package.swift
           echo "    .target(" >> Package.swift
           echo "      name: \"Tun2SocksKit\"," >> Package.swift
-          echo "      dependencies: [\"HevSocks5Tunnel\", \"Tun2SocksKitC\"]" >> Package.swift
+          echo "      dependencies: [\"NetworkTunnelProcessor\", \"Tun2SocksKitC\"]" >> Package.swift
           echo "    )," >> Package.swift
           echo "    .target(" >> Package.swift
           echo "      name: \"Tun2SocksKitC\"," >> Package.swift
           echo "      publicHeadersPath: \".\"" >> Package.swift
           echo "    )," >> Package.swift
           echo "    .binaryTarget(" >> Package.swift
-          echo "      name: \"HevSocks5Tunnel\"," >> Package.swift
-          echo "      url: \"https://github.com/tozik/Tun2Socks/releases/download/${{ github.event.inputs.version }}/HevSocks5Tunnel.xcframework.zip\"," >> Package.swift
+          echo "      name: \"NetworkTunnelProcessor\"," >> Package.swift
+          echo "      url: \"https://github.com/tozik/Tun2Socks/releases/download/${{ github.event.inputs.version }}/NetworkTunnelProcessor.xcframework.zip\"," >> Package.swift
           echo "      checksum: \"$CHECKSUM\"" >> Package.swift
           echo "    )" >> Package.swift
           echo "  ]" >> Package.swift
@@ -148,17 +161,21 @@ jobs:
       - name: Commit Package.swift
         run: |
           # Выводим список файлов в текущем каталоге и проверяем артефакт
-          ls -l ./HevSocks5Tunnel.xcframework.zip
-          shasum -a 256 ./HevSocks5Tunnel.xcframework.zip
+          ls -l ./NetworkTunnelProcessor.xcframework.zip
+          shasum -a 256 ./NetworkTunnelProcessor.xcframework.zip
+          
+          # Настраиваем git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           
           # Добавляем только Package.swift в git
           git add Package.swift
           
-          # Выполняем commit с тегом версии
-          git commit -m "Update Package.swift for version ${{ github.event.inputs.version }}"
+          # Выполняем commit с информацией о версии и ветке
+          git commit -m "Update Package.swift for version ${{ github.event.inputs.version }} from branch ${{ github.event.inputs.branch }}"
           
-          # Пушим изменения в текущий репозиторий
-          git push
+          # Пушим изменения в выбранную ветку
+          git push origin ${{ github.event.inputs.branch }}
       
       # Создаем релиз и загружаем артефакт в секцию "Releases" GitHub
       - name: Upload release asset to GitHub Releases
@@ -166,7 +183,19 @@ jobs:
         with:
           draft: false
           tag_name: ${{ github.event.inputs.version }}
-          body: 'Release built from source ${{ github.event.inputs.tag }}'
-          files: ./HevSocks5Tunnel.xcframework.zip
+          body: |
+            Release built from source tag: ${{ github.event.inputs.tag }}
+            Source branch: ${{ github.event.inputs.branch }}
+            
+            ## Changes in this release:
+            - Built with NetworkTunnelProcessor framework
+            - Source code obfuscated for enhanced security
+            
+            ## Installation:
+            Add this package to your project using Swift Package Manager:
+            ```
+            https://github.com/tozik/Tun2Socks
+            ```
+          files: ./NetworkTunnelProcessor.xcframework.zip
           token: ${{ secrets.GITHUB_TOKEN }}
 
