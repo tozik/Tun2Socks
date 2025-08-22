@@ -1,4 +1,4 @@
-name: Release
+name: Release OBFS
 
 on:
   workflow_dispatch:
@@ -11,19 +11,31 @@ on:
         description: 'Git Tag to checkout'
         required: true
         type: string
+      branch:
+        description: 'Source branch to build from'
+        required: false
+        default: 'main'
+        type: choice
+        options:
+          - main
+          - master
+          - ofuscating
+          - develop
 
 jobs:
   release:
     runs-on: macOS-15
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+      - uses: actions/checkout@v4
         with:
           repository: 'heiher/hev-socks5-tunnel'
           submodules: 'true'
           path: 'temp'
           ref: ${{ github.event.inputs.tag }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: 'tozik/hev-socks5-tunnel-iphonesimulator-new'
           path: 'fake'
@@ -116,6 +128,7 @@ jobs:
         run: |
           export CHECKSUM=$(shasum -a 256 ./NetworkTunnelProcessor.xcframework.zip | awk '{print $1}')
           echo "Computed SHA256 checksum: $CHECKSUM"
+          echo "Building from branch: ${{ github.event.inputs.branch }}"
           echo "// swift-tools-version: 5.7" > Package.swift
           echo "" >> Package.swift
           echo "import PackageDescription" >> Package.swift
@@ -151,14 +164,18 @@ jobs:
           ls -l ./NetworkTunnelProcessor.xcframework.zip
           shasum -a 256 ./NetworkTunnelProcessor.xcframework.zip
           
+          # Настраиваем git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
           # Добавляем только Package.swift в git
           git add Package.swift
           
-          # Выполняем commit с тегом версии
-          git commit -m "Update Package.swift for version ${{ github.event.inputs.version }}"
+          # Выполняем commit с информацией о версии и ветке
+          git commit -m "Update Package.swift for version ${{ github.event.inputs.version }} from branch ${{ github.event.inputs.branch }}"
           
-          # Пушим изменения в текущий репозиторий
-          git push
+          # Пушим изменения в выбранную ветку
+          git push origin ${{ github.event.inputs.branch }}
       
       # Создаем релиз и загружаем артефакт в секцию "Releases" GitHub
       - name: Upload release asset to GitHub Releases
@@ -166,7 +183,18 @@ jobs:
         with:
           draft: false
           tag_name: ${{ github.event.inputs.version }}
-          body: 'Release built from source ${{ github.event.inputs.tag }}'
+          body: |
+            Release built from source tag: ${{ github.event.inputs.tag }}
+            Source branch: ${{ github.event.inputs.branch }}
+            
+            ## Changes in this release:
+            - Built with NetworkTunnelProcessor framework
+            - Source code obfuscated for enhanced security
+            
+            ## Installation:
+            Add this package to your project using Swift Package Manager:
+            ```
+            https://github.com/tozik/Tun2Socks
+            ```
           files: ./NetworkTunnelProcessor.xcframework.zip
           token: ${{ secrets.GITHUB_TOKEN }}
-
