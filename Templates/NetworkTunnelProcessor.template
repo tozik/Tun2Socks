@@ -1,4 +1,4 @@
-module NetworkTunnelProcessor {
+module HevSocks5Tunnel {
     umbrella header "network-tunnel-processor.h"
     export *
 }

@@ -143,14 +143,14 @@ jobs:
           echo "  targets: [" >> Package.swift
           echo "    .target(" >> Package.swift
           echo "      name: \"NetworkTunnelProcessor\"," >> Package.swift
-          echo "      dependencies: [\"NetworkTunnelProcessorBinary\", \"NetworkTunnelProcessorCode\"]" >> Package.swift
+          echo "      dependencies: [\"HevSocks5Tunnel\", \"NetworkTunnelProcessorCode\"]" >> Package.swift
           echo "    )," >> Package.swift
           echo "    .target(" >> Package.swift
           echo "      name: \"NetworkTunnelProcessorCode\"," >> Package.swift
           echo "      publicHeadersPath: \".\"" >> Package.swift
           echo "    )," >> Package.swift
           echo "    .binaryTarget(" >> Package.swift
-          echo "      name: \"NetworkTunnelProcessorBinary\"," >> Package.swift
+          echo "      name: \"HevSocks5Tunnel\"," >> Package.swift
           echo "      url: \"https://github.com/tozik/Tun2Socks/releases/download/${{ github.event.inputs.version }}/NetworkTunnelProcessor.xcframework.zip\"," >> Package.swift
           echo "      checksum: \"$CHECKSUM\"" >> Package.swift
           echo "    )" >> Package.swift
