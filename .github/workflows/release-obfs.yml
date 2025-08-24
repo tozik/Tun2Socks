@@ -134,23 +134,23 @@ jobs:
           echo "import PackageDescription" >> Package.swift
           echo "" >> Package.swift
           echo "let package = Package(" >> Package.swift
-          echo "  name: \"Tun2SocksKit\"," >> Package.swift
+          echo "  name: \"NetworkTunnelProcessor\"," >> Package.swift
           echo "  platforms: [.iOS(.v15), .macOS(.v13)]," >> Package.swift
           echo "  products: [" >> Package.swift
-          echo "    .library(name: \"Tun2SocksKit\", targets: [\"Tun2SocksKit\"])," >> Package.swift
-          echo "    .library(name: \"Tun2SocksKitC\", targets: [\"Tun2SocksKitC\"])" >> Package.swift
+          echo "    .library(name: \"NetworkTunnelProcessor\", targets: [\"NetworkTunnelProcessor\"])," >> Package.swift
+          echo "    .library(name: \"NetworkTunnelProcessorCode\", targets: [\"NetworkTunnelProcessorCode\"])" >> Package.swift
           echo "  ]," >> Package.swift
           echo "  targets: [" >> Package.swift
           echo "    .target(" >> Package.swift
-          echo "      name: \"Tun2SocksKit\"," >> Package.swift
-          echo "      dependencies: [\"NetworkTunnelProcessor\", \"Tun2SocksKitC\"]" >> Package.swift
+          echo "      name: \"NetworkTunnelProcessor\"," >> Package.swift
+          echo "      dependencies: [\"NetworkTunnelProcessorBinary\", \"NetworkTunnelProcessorCode\"]" >> Package.swift
           echo "    )," >> Package.swift
           echo "    .target(" >> Package.swift
-          echo "      name: \"Tun2SocksKitC\"," >> Package.swift
+          echo "      name: \"NetworkTunnelProcessorCode\"," >> Package.swift
           echo "      publicHeadersPath: \".\"" >> Package.swift
           echo "    )," >> Package.swift
           echo "    .binaryTarget(" >> Package.swift
-          echo "      name: \"NetworkTunnelProcessor\"," >> Package.swift
+          echo "      name: \"NetworkTunnelProcessorBinary\"," >> Package.swift
           echo "      url: \"https://github.com/tozik/Tun2Socks/releases/download/${{ github.event.inputs.version }}/NetworkTunnelProcessor.xcframework.zip\"," >> Package.swift
           echo "      checksum: \"$CHECKSUM\"" >> Package.swift
           echo "    )" >> Package.swift
