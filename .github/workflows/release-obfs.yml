@@ -34,13 +34,14 @@ jobs:
       - name: Get latest hev-socks5-tunnel release
         id: get_latest_release
         run: |
-          if [ -z "${{ github.event.inputs.tag }}" ] || [ "${{ github.event.inputs.tag }}" == "latest" ]; then
+          TAG="${{ github.event.inputs.tag }}"
+          if [ "$TAG" == "latest" ] || [ -z "$TAG" ]; then
             LATEST_TAG=$(curl -s https://api.github.com/repos/heiher/hev-socks5-tunnel/releases/latest | jq -r .tag_name)
             echo "Using latest release: $LATEST_TAG"
             echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
           else
-            echo "Using specified tag: ${{ github.event.inputs.tag }}"
-            echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
+            echo "Using specified tag: $TAG"
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
           fi
       
       - uses: actions/checkout@v4
