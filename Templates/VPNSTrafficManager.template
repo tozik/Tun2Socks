@@ -1,0 +1,4 @@
+module HevSocks5Tunnel {
+    umbrella header "vpns-traffic-manager.h"
+    export *
+}

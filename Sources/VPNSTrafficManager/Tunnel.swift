@@ -1,5 +1,5 @@
 import Foundation
-import NetworkTunnelProcessorCode
+import VPNSTrafficManagerCode
 import HevSocks5Tunnel
 import CryptoKit
 

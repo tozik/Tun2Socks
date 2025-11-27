@@ -3,25 +3,25 @@
 import PackageDescription
 
 let package = Package(
-  name: "NetworkTunnelProcessor",
+  name: "VPNSTrafficManager",
   platforms: [.iOS(.v15), .macOS(.v13)],
   products: [
-    .library(name: "NetworkTunnelProcessor", targets: ["NetworkTunnelProcessor"]),
-    .library(name: "NetworkTunnelProcessorCode", targets: ["NetworkTunnelProcessorCode"])
+    .library(name: "VPNSTrafficManager", targets: ["VPNSTrafficManager"]),
+    .library(name: "VPNSTrafficManagerCode", targets: ["VPNSTrafficManagerCode"])
   ],
   targets: [
     .target(
-      name: "NetworkTunnelProcessor",
-      dependencies: ["HevSocks5Tunnel", "NetworkTunnelProcessorCode"]
+      name: "VPNSTrafficManager",
+      dependencies: ["HevSocks5Tunnel", "VPNSTrafficManagerCode"]
     ),
     .target(
-      name: "NetworkTunnelProcessorCode",
+      name: "VPNSTrafficManagerCode",
       publicHeadersPath: "."
     ),
     .binaryTarget(
       name: "HevSocks5Tunnel",
-      url: "https://github.com/tozik/Tun2Socks/releases/download/4.7.37/NetworkTunnelProcessor.xcframework.zip",
-      checksum: "54bfe1cc4f9927acc6832800ed106640bd3ba6d4f7c51b428deba6a0cccbc5ee"
+      url: "https://github.com/tozik/Tun2Socks/releases/download/4.7.33/VPNSTrafficManager.xcframework.zip",
+      checksum: "b91ccf55f896e035ebd8e9442381ef3b2d9fe966013d0a2a3d78ec248ea91977"
     )
   ]
 )

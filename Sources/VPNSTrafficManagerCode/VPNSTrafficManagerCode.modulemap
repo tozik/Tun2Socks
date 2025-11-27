@@ -1,0 +1,4 @@
+module VPNSTrafficManagerCode {
+    umbrella header "VPNSTrafficManagerCode.h"
+    export *
+}

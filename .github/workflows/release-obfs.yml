@@ -112,8 +112,8 @@ jobs:
       - name: Build xcframework
         run: |
           mkdir include
-          cp temp/src/hev-main.h include/network-tunnel-processor.h
-          cp ./Templates/NetworkTunnelProcessor.template include/module.modulemap
+          cp temp/src/hev-main.h include/vpns-traffic-manager.h
+          cp ./Templates/VPNSTrafficManager.template include/module.modulemap
           xcodebuild -create-xcframework \
                      -library ./iphoneos_arm64/libhev-socks5-tunnel.a \
                      -headers ./include \
@@ -121,12 +121,12 @@ jobs:
                      -headers ./include \
                      -library ./macos_arm64_x86_64/libhev-socks5-tunnel.a \
                      -headers ./include \
-                     -output ./NetworkTunnelProcessor.xcframework
-          zip -r NetworkTunnelProcessor.xcframework.zip NetworkTunnelProcessor.xcframework
+                     -output ./VPNSTrafficManager.xcframework
+          zip -r VPNSTrafficManager.xcframework.zip VPNSTrafficManager.xcframework
       
       - name: Update package file
         run: |
-          export CHECKSUM=$(shasum -a 256 ./NetworkTunnelProcessor.xcframework.zip | awk '{print $1}')
+          export CHECKSUM=$(shasum -a 256 ./VPNSTrafficManager.xcframework.zip | awk '{print $1}')
           echo "Computed SHA256 checksum: $CHECKSUM"
           echo "Building from branch: ${{ github.event.inputs.branch }}"
           echo "// swift-tools-version: 5.7" > Package.swift
@@ -134,24 +134,24 @@ jobs:
           echo "import PackageDescription" >> Package.swift
           echo "" >> Package.swift
           echo "let package = Package(" >> Package.swift
-          echo "  name: \"NetworkTunnelProcessor\"," >> Package.swift
+          echo "  name: \"VPNSTrafficManager\"," >> Package.swift
           echo "  platforms: [.iOS(.v15), .macOS(.v13)]," >> Package.swift
           echo "  products: [" >> Package.swift
-          echo "    .library(name: \"NetworkTunnelProcessor\", targets: [\"NetworkTunnelProcessor\"])," >> Package.swift
-          echo "    .library(name: \"NetworkTunnelProcessorCode\", targets: [\"NetworkTunnelProcessorCode\"])" >> Package.swift
+          echo "    .library(name: \"VPNSTrafficManager\", targets: [\"VPNSTrafficManager\"])," >> Package.swift
+          echo "    .library(name: \"VPNSTrafficManagerCode\", targets: [\"VPNSTrafficManagerCode\"])" >> Package.swift
           echo "  ]," >> Package.swift
           echo "  targets: [" >> Package.swift
           echo "    .target(" >> Package.swift
-          echo "      name: \"NetworkTunnelProcessor\"," >> Package.swift
-          echo "      dependencies: [\"HevSocks5Tunnel\", \"NetworkTunnelProcessorCode\"]" >> Package.swift
+          echo "      name: \"VPNSTrafficManager\"," >> Package.swift
+          echo "      dependencies: [\"HevSocks5Tunnel\", \"VPNSTrafficManagerCode\"]" >> Package.swift
           echo "    )," >> Package.swift
           echo "    .target(" >> Package.swift
-          echo "      name: \"NetworkTunnelProcessorCode\"," >> Package.swift
+          echo "      name: \"VPNSTrafficManagerCode\"," >> Package.swift
           echo "      publicHeadersPath: \".\"" >> Package.swift
           echo "    )," >> Package.swift
           echo "    .binaryTarget(" >> Package.swift
           echo "      name: \"HevSocks5Tunnel\"," >> Package.swift
-          echo "      url: \"https://github.com/tozik/Tun2Socks/releases/download/${{ github.event.inputs.version }}/NetworkTunnelProcessor.xcframework.zip\"," >> Package.swift
+          echo "      url: \"https://github.com/tozik/Tun2Socks/releases/download/${{ github.event.inputs.version }}/VPNSTrafficManager.xcframework.zip\"," >> Package.swift
           echo "      checksum: \"$CHECKSUM\"" >> Package.swift
           echo "    )" >> Package.swift
           echo "  ]" >> Package.swift
@@ -161,8 +161,8 @@ jobs:
       - name: Commit Package.swift
         run: |
           # Выводим список файлов в текущем каталоге и проверяем артефакт
-          ls -l ./NetworkTunnelProcessor.xcframework.zip
-          shasum -a 256 ./NetworkTunnelProcessor.xcframework.zip
+          ls -l ./VPNSTrafficManager.xcframework.zip
+          shasum -a 256 ./VPNSTrafficManager.xcframework.zip
           
           # Настраиваем git
           git config --local user.email "action@github.com"
@@ -192,7 +192,7 @@ jobs:
             Source branch: ${{ github.event.inputs.branch }}
             
             ## Changes in this release:
-            - Built with NetworkTunnelProcessor framework
+            - Built with VPNSTrafficManager framework
             - Source code obfuscated for enhanced security
             
             ## Installation:
@@ -200,5 +200,5 @@ jobs:
             ```
             https://github.com/tozik/Tun2Socks
             ```
-          files: ./NetworkTunnelProcessor.xcframework.zip
+          files: ./VPNSTrafficManager.xcframework.zip
           token: ${{ secrets.GITHUB_TOKEN }}

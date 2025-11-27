@@ -1,5 +1,5 @@
-#ifndef NetworkTunnelProcessorCode_H
-#define NetworkTunnelProcessorCode_H
+#ifndef VPNSTrafficManagerCode_H
+#define VPNSTrafficManagerCode_H
 
 #include <stdint.h>
 
@@ -24,4 +24,4 @@ struct sockaddr_ctl {
     u_int32_t   sc_reserved[5];
 };
 
-#endif /* NetworkTunnelProcessorCode_H */
+#endif /* VPNSTrafficManagerCode_H */
