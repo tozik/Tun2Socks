@@ -65,18 +65,17 @@ jobs:
           make PP=g++ \
                CC=gcc \
                CFLAGS="-arch x86_64 -mmacosx-version-min=12.0" \
-               LFLAGS="-arch x86_64 -mmacosx-version-min=12.0 -Wl,-Bsymbolic-functions" static
+               LFLAGS="-arch x86_64 -mmacosx-version-min=12.0" static
           libtool -static -o ../macos_arm64_x86_64/macos_x86_64/libhev-socks5-tunnel.a \
                   bin/libhev-socks5-tunnel.a \
                   third-part/lwip/bin/liblwip.a \
                   third-part/yaml/bin/libyaml.a \
                   third-part/hev-task-system/bin/libhev-task-system.a
           make clean
-          make clean
           make PP=g++ \
                CC=gcc \
                CFLAGS="-arch arm64 -mmacosx-version-min=12.0" \
-               LFLAGS="-arch arm64 -mmacosx-version-min=12.0 -Wl,-Bsymbolic-functions" static
+               LFLAGS="-arch arm64 -mmacosx-version-min=12.0" static
           libtool -static -o ../macos_arm64_x86_64/macos_arm64/libhev-socks5-tunnel.a \
                   bin/libhev-socks5-tunnel.a \
                   third-part/lwip/bin/liblwip.a \
@@ -94,7 +93,7 @@ jobs:
           make PP="xcrun --sdk iphoneos --toolchain iphoneos clang" \
                CC="xcrun --sdk iphoneos --toolchain iphoneos clang" \
                CFLAGS="-arch arm64 -mios-version-min=12.0" \
-               LFLAGS="-arch arm64 -mios-version-min=12.0 -Wl,-Bsymbolic-functions" static
+               LFLAGS="-arch arm64 -mios-version-min=12.0" static
           libtool -static -o ../iphoneos_arm64/libhev-socks5-tunnel.a \
                   bin/libhev-socks5-tunnel.a \
                   third-part/lwip/bin/liblwip.a \
@@ -112,13 +111,13 @@ jobs:
           make PP="xcrun -sdk iphonesimulator clang" \
                CC="xcrun -sdk iphonesimulator clang" \
                CFLAGS="-arch arm64 -mios-simulator-version-min=12.0" \
-               LFLAGS="-arch arm64 -mios-simulator-version-min=12.0 -Wl,-Bsymbolic-functions" static
+               LFLAGS="-arch arm64 -mios-simulator-version-min=12.0" static
           cp bin/libhev-socks5-tunnel.a ../iphonesimulator_arm64_x86_64/iphonesimulator_arm64/libhev-socks5-tunnel.a
           make clean
           make PP="xcrun -sdk iphonesimulator clang" \
                CC="xcrun -sdk iphonesimulator clang" \
                CFLAGS="-arch x86_64 -mios-simulator-version-min=12.0" \
-               LFLAGS="-arch x86_64 -mios-simulator-version-min=12.0 -Wl,-Bsymbolic-functions" static
+               LFLAGS="-arch x86_64 -mios-simulator-version-min=12.0" static
           cp bin/libhev-socks5-tunnel.a ../iphonesimulator_arm64_x86_64/iphonesimulator_x86_64/libhev-socks5-tunnel.a
           make clean
           cd ../iphonesimulator_arm64_x86_64
