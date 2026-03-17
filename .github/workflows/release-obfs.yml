@@ -12,31 +12,23 @@ on:
         required: false
         default: 'latest'
         type: string
-      branch:
-        description: 'Source branch to build from'
-        required: false
-        default: 'ofuscating'
-        type: choice
-        options:
-          - main
-          - master
-          - ofuscating
-          - develop
 
 jobs:
   release:
     runs-on: macOS-15
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch }}
+          fetch-depth: 0
       
       - name: Get latest hev-socks5-tunnel release
         id: get_latest_release
         run: |
           TAG="${{ github.event.inputs.tag }}"
           if [ "$TAG" == "latest" ] || [ -z "$TAG" ]; then
-            LATEST_TAG=$(curl -s https://api.github.com/repos/heiher/hev-socks5-tunnel/releases/latest | jq -r .tag_name)
+            LATEST_TAG=$(curl -s https://api.github.com/repos/heiher/hev-socks5-tunnel/releases/latest | python3 -c "import json,sys; print(json.load(sys.stdin)['tag_name'])")
             echo "Using latest release: $LATEST_TAG"
             echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
           else
@@ -142,7 +134,7 @@ jobs:
         run: |
           export CHECKSUM=$(shasum -a 256 ./VPNSTrafficManager.xcframework.zip | awk '{print $1}')
           echo "Computed SHA256 checksum: $CHECKSUM"
-          echo "Building from branch: ${{ github.event.inputs.branch }}"
+          echo "Building from branch: ${{ github.ref_name }}"
           echo "// swift-tools-version: 5.7" > Package.swift
           echo "" >> Package.swift
           echo "import PackageDescription" >> Package.swift
@@ -185,15 +177,19 @@ jobs:
           # Добавляем только Package.swift в git
           git add Package.swift
           
-          # Выполняем commit с информацией о версии и ветке
-          git commit -m "Update Package.swift for version ${{ github.event.inputs.version }} from branch ${{ github.event.inputs.branch }}"
+          # Коммитим только если реально есть изменения
+          if git diff --cached --quiet; then
+            echo "No Package.swift changes to commit"
+          else
+            git commit -m "Update Package.swift for version ${{ github.event.inputs.version }} from branch ${{ github.ref_name }}"
+          fi
           
           # Пушим изменения в выбранную ветку
-          git push origin ${{ github.event.inputs.branch }}
+          git push origin "HEAD:${{ github.ref_name }}"
           
           # Создаем новый тег для релиза
-          git tag -f ${{ github.event.inputs.version }}
-          git push origin ${{ github.event.inputs.version }} --force
+          git tag -f "${{ github.event.inputs.version }}"
+          git push origin "refs/tags/${{ github.event.inputs.version }}" --force
       
       # Создаем релиз и загружаем артефакт в секцию "Releases" GitHub
       - name: Upload release asset to GitHub Releases
@@ -201,9 +197,10 @@ jobs:
         with:
           draft: false
           tag_name: ${{ github.event.inputs.version }}
+          target_commitish: ${{ github.ref_name }}
           body: |
             Release built from source tag: ${{ steps.get_latest_release.outputs.tag }}
-            Source branch: ${{ github.event.inputs.branch }}
+            Source branch: ${{ github.ref_name }}
             
             ## Changes in this release:
             - Built with VPNSTrafficManager framework
